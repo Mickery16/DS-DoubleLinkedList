@@ -7,14 +7,16 @@ public class DoubleLinkedList<E> extends AbstractSequentialList<E> {  // Data fi
     private Node<E> tail = null;   //points to the tail of the list
     private int size = 0;    // the number of items in the list
 
-    public void add(int index, E obj) { // Fill Here
+    public void add(int index, E obj) {
+        listIterator(index).add(obj);
     }
 
-    public void addFirst(E obj) { // Fill Here
-
+    public void addFirst(E obj) {
+        add(0, obj);
     }
 
-    public void addLast(E obj) { // Fill Here
+    public void addLast(E obj) {
+        add(size, obj);
     }
 
     public E get(int index) {
@@ -31,8 +33,8 @@ public class DoubleLinkedList<E> extends AbstractSequentialList<E> {  // Data fi
     }
 
     public int size() {
-        return -1;
-    } // Fill Here
+        return size;
+    }
 
     public E remove(int index) {
         E returnValue = null;
@@ -93,7 +95,9 @@ public class DoubleLinkedList<E> extends AbstractSequentialList<E> {  // Data fi
             } else          // start at the beginning
             {
                 nextItem = head;
-                for (index = 0; index < i; index++) nextItem = nextItem.next;
+                for (index = 0; index < i; index++){
+                    nextItem = nextItem.next;
+                }
             }// end else
         }  // end constructor
 
@@ -104,37 +108,103 @@ public class DoubleLinkedList<E> extends AbstractSequentialList<E> {  // Data fi
 
         public boolean hasNext() {
             return nextItem != null;
-        } // Fill Here
+        }
 
         public boolean hasPrevious() {
-            return false;
-        } // Fill Here
+            return head!= null;
+        }
 
         public int previousIndex() {
-            return 0;
-        } // Fill Here
+            return index - 1;
+        }
 
         public int nextIndex() {
-            return 0;
-        } // Fill here
+            return index;
+        }
 
         public void set(E o) {
-        }  // not implemented
+            if (lastItemReturned != null){
+                lastItemReturned.data = o;
+            } else {
+                System.err.println("Cannot set");
+            }
+        }
 
         public void remove() {
-        }      // not implemented
+            if (lastItemReturned != null){
+                if(lastItemReturned.next != null){
+                    lastItemReturned.next.prev = lastItemReturned.prev;
+                } else {
+                    tail = lastItemReturned.prev;
+                    if (tail != null){
+                        tail.next = null;
+                    } else {
+                        tail = null;
+                    }
+                }
+                if(lastItemReturned.prev != null) {
+                    lastItemReturned.prev.next = lastItemReturned.next;
+                } else {
+                    head = lastItemReturned.next;
+                    if (head != null){
+                        head.prev = null;
+                    } else {
+                        tail = null;
+                    }
+                }
+            } else {
+                System.err.println("Cannot remove");
+            }
+        }
 
         public E next() {
-            return lastItemReturned.data; // Fill Here
+            if(hasNext()){
+                lastItemReturned = nextItem;
+                nextItem = nextItem.next;
+                index++;
+            }
+            else{
+                System.err.println("No next item");
+            }
+            return lastItemReturned.data;
         }
 
         public E previous() {
-            return lastItemReturned.data; // Fill Here
+            if(hasPrevious()){
+                if(nextItem != null){
+                    nextItem = nextItem.prev;
+                }
+                else{
+                    nextItem = tail;
+                }
+            }
+            lastItemReturned = nextItem;
+            index--;
+            return lastItemReturned.data;
         }
 
         public void add(E obj) {
-
-            // Fill Here
+            Node<E> node = new Node<>(obj);
+            if(head == null){
+                head = new Node<>(obj);
+                tail = head;
+            } else if (nextItem == null){
+                tail.next = node;
+                node.prev = tail;
+                tail = node;
+            } else if (nextItem == head){
+                node.next = nextItem;
+                nextItem.prev = node;
+                head = node;
+            } else {
+                node.prev = nextItem.prev;
+                nextItem.prev.next = node;
+                node.next = nextItem;
+                nextItem.prev = node;
+            }
+            index++;
+            size++;
+            lastItemReturned = null;
         }
     }// end of inner class ListIter
 }// end of class DoubleLinkedList
